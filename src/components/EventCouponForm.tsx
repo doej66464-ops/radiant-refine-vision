@@ -5,7 +5,11 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { X, MapPin, Calendar, Clock, Percent, Tag } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { X, MapPin, Calendar, Clock, Percent, Tag, DollarSign, CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 const EventCouponForm = () => {
   const [code, setCode] = useState("PERCENTAGE1");
@@ -16,6 +20,11 @@ const EventCouponForm = () => {
   const [unlimitedDuration, setUnlimitedDuration] = useState(true);
   const [duration, setDuration] = useState("8");
   const [locations] = useState(["Building-1, Ecospace", "Building-2, Ecospace"]);
+  const [discountType, setDiscountType] = useState<"%" | "$">("%");
+  const [startDate, setStartDate] = useState<Date>();
+  const [endDate, setEndDate] = useState<Date>();
+  const [startTime, setStartTime] = useState("09:00");
+  const [endTime, setEndTime] = useState("17:00");
   
   const weeklyDiscounts = [
     { day: "Mon", value: "0" },
@@ -31,18 +40,24 @@ const EventCouponForm = () => {
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-4xl mx-auto">
         <Card className="shadow-lg border-border">
-          <CardHeader className="bg-primary text-primary-foreground rounded-t-lg">
+          <CardHeader className="bg-white text-foreground rounded-t-lg border-b">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <Tag className="h-6 w-6" />
+                <Tag className="h-6 w-6 text-primary" />
                 <div>
                   <h1 className="text-2xl font-bold">Event Coupon</h1>
-                  <p className="text-primary-foreground/80 text-sm">Updated by: Sandeep Koduri</p>
+                  <p className="text-muted-foreground text-sm">Updated by: Sandeep Koduri</p>
                 </div>
               </div>
-              <div className="bg-primary-foreground/20 px-3 py-1 rounded-full">
-                <span className="text-sm font-medium">%</span>
-              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setDiscountType(discountType === "%" ? "$" : "%")}
+                className="px-3 py-1 h-8"
+              >
+                {discountType === "%" ? <Percent className="h-4 w-4" /> : <DollarSign className="h-4 w-4" />}
+                <span className="ml-1 text-sm font-medium">{discountType}</span>
+              </Button>
             </div>
           </CardHeader>
           
@@ -105,7 +120,7 @@ const EventCouponForm = () => {
                     onChange={(e) => setDiscount(e.target.value)}
                     className="h-12 text-lg text-center font-bold bg-accent border-2"
                   />
-                  <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground font-bold">%</span>
+                  <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground font-bold">{discountType}</span>
                 </div>
               </div>
             </div>
@@ -160,7 +175,7 @@ const EventCouponForm = () => {
                     value={duration}
                     onChange={(e) => setDuration(e.target.value)}
                     className="h-12 text-lg text-center font-bold bg-accent border-2"
-                    disabled={forever}
+                    disabled={forever || unlimitedDuration}
                   />
                 </div>
                 <div className="flex items-center space-x-2">
@@ -174,6 +189,85 @@ const EventCouponForm = () => {
                   </Label>
                 </div>
               </div>
+
+              {/* Date/Time Selection when not forever */}
+              {!forever && (
+                <div className="space-y-4 border-t pt-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Start Date & Time */}
+                    <div className="space-y-3">
+                      <Label className="text-sm font-medium">Start Date & Time</Label>
+                      <div className="grid grid-cols-2 gap-2">
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              className={cn(
+                                "justify-start text-left font-normal",
+                                !startDate && "text-muted-foreground"
+                              )}
+                            >
+                              <CalendarIcon className="mr-2 h-4 w-4" />
+                              {startDate ? format(startDate, "PPP") : <span>Pick date</span>}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <CalendarComponent
+                              mode="single"
+                              selected={startDate}
+                              onSelect={setStartDate}
+                              initialFocus
+                              className="p-3 pointer-events-auto"
+                            />
+                          </PopoverContent>
+                        </Popover>
+                        <Input
+                          type="time"
+                          value={startTime}
+                          onChange={(e) => setStartTime(e.target.value)}
+                          className="bg-muted"
+                        />
+                      </div>
+                    </div>
+
+                    {/* End Date & Time */}
+                    <div className="space-y-3">
+                      <Label className="text-sm font-medium">End Date & Time</Label>
+                      <div className="grid grid-cols-2 gap-2">
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              className={cn(
+                                "justify-start text-left font-normal",
+                                !endDate && "text-muted-foreground"
+                              )}
+                            >
+                              <CalendarIcon className="mr-2 h-4 w-4" />
+                              {endDate ? format(endDate, "PPP") : <span>Pick date</span>}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <CalendarComponent
+                              mode="single"
+                              selected={endDate}
+                              onSelect={setEndDate}
+                              initialFocus
+                              className="p-3 pointer-events-auto"
+                            />
+                          </PopoverContent>
+                        </Popover>
+                        <Input
+                          type="time"
+                          value={endTime}
+                          onChange={(e) => setEndTime(e.target.value)}
+                          className="bg-muted"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Location Section */}
