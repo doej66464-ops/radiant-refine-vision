@@ -25,6 +25,8 @@ const EventCouponForm = () => {
   const [endDate, setEndDate] = useState<Date>();
   const [startTime, setStartTime] = useState("09:00");
   const [endTime, setEndTime] = useState("17:00");
+  const [bookingEndDate, setBookingEndDate] = useState<Date>();
+  const [bookingEndTime, setBookingEndTime] = useState("18:00");
   
   const weeklyDiscounts = [
     { day: "Mon", value: "0" },
@@ -192,7 +194,7 @@ const EventCouponForm = () => {
 
               {/* Date/Time Selection when not forever */}
               {!forever && (
-                <div className="space-y-4 border-t pt-4">
+                <div className="space-y-6 border-t pt-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Start Date & Time */}
                     <div className="space-y-3">
@@ -261,6 +263,44 @@ const EventCouponForm = () => {
                           type="time"
                           value={endTime}
                           onChange={(e) => setEndTime(e.target.value)}
+                          className="bg-muted"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Booking End Date & Time */}
+                    <div className="space-y-3">
+                      <Label className="text-sm font-medium">Booking End Date & Time</Label>
+                      <div className="grid grid-cols-2 gap-2">
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              className={cn(
+                                "justify-start text-left font-normal",
+                                !bookingEndDate && "text-muted-foreground"
+                              )}
+                            >
+                              <CalendarIcon className="mr-2 h-4 w-4" />
+                              {bookingEndDate ? format(bookingEndDate, "PPP") : <span>Pick date</span>}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <CalendarComponent
+                              mode="single"
+                              selected={bookingEndDate}
+                              onSelect={setBookingEndDate}
+                              initialFocus
+                              className="p-3 pointer-events-auto"
+                            />
+                          </PopoverContent>
+                        </Popover>
+                        <Input
+                          type="time"
+                          value={bookingEndTime}
+                          onChange={(e) => setBookingEndTime(e.target.value)}
                           className="bg-muted"
                         />
                       </div>
