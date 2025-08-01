@@ -224,7 +224,7 @@ const EventCouponForm = () => {
                 
                 {/* Booking End Date & Time aligned with unlimited duration */}
                 {!forever && (
-                  <div className="flex items-center gap-4 ml-8">
+                  <div className="flex items-center gap-3 ml-8">
                     <div className="space-y-1">
                       <Label className="text-xs font-medium text-muted-foreground">Booking End Date</Label>
                       <Popover>
@@ -233,12 +233,12 @@ const EventCouponForm = () => {
                             variant="outline"
                             size="sm"
                             className={cn(
-                              "w-32 justify-start text-left font-normal text-xs",
+                              "w-40 justify-start text-left font-normal text-xs",
                               !bookingEndDate && "text-muted-foreground"
                             )}
                           >
                             <CalendarIcon className="mr-1 h-3 w-3" />
-                            {bookingEndDate ? format(bookingEndDate, "MM/dd") : <span>Pick date</span>}
+                            {bookingEndDate ? format(bookingEndDate, "MMM dd, yyyy") : <span>Pick date</span>}
                           </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0" align="start">
@@ -253,12 +253,12 @@ const EventCouponForm = () => {
                       </Popover>
                     </div>
                     <div className="space-y-1">
-                      <Label className="text-xs font-medium text-muted-foreground">Time</Label>
+                      <Label className="text-xs font-medium text-muted-foreground">End Time</Label>
                       <Input
                         type="time"
                         value={bookingEndTime}
                         onChange={(e) => setBookingEndTime(e.target.value)}
-                        className="w-20 h-8 text-xs bg-muted"
+                        className="w-24 h-8 text-xs bg-muted"
                       />
                     </div>
                   </div>
@@ -361,10 +361,6 @@ const EventCouponForm = () => {
               
               {restrictedTime && (
                 <div className="space-y-4">
-                  <Label className="text-base font-semibold flex items-center gap-2">
-                    <Calendar className="h-4 w-4" />
-                    Weekly Time Duration
-                  </Label>
                   <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
                     {weeklyTimeRestrictions.map((item) => (
                       <div key={item.day} className="text-center space-y-2">
@@ -372,7 +368,7 @@ const EventCouponForm = () => {
                         <div className="relative">
                           <Input
                             value={item.value}
-                            className="h-10 text-center font-semibold bg-accent border-2 text-xs"
+                            className="h-10 text-center font-light bg-accent border-2 text-xs"
                             readOnly
                           />
                         </div>
