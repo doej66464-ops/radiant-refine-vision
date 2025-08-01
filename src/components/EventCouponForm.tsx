@@ -30,6 +30,7 @@ const EventCouponForm = () => {
   const [endTime, setEndTime] = useState("17:00");
   const [bookingEndDate, setBookingEndDate] = useState<Date>();
   const [bookingEndTime, setBookingEndTime] = useState("18:00");
+  const [restrictedTime, setRestrictedTime] = useState(false);
   
   const weeklyDiscounts = [
     { day: "Mon", value: "0" },
@@ -39,6 +40,16 @@ const EventCouponForm = () => {
     { day: "Fri", value: "10" },
     { day: "Sat", value: "10" },
     { day: "Sun", value: "10" }
+  ];
+
+  const weeklyTimeRestrictions = [
+    { day: "Mon", value: "8" },
+    { day: "Tue", value: "8" },
+    { day: "Wed", value: "8" },
+    { day: "Thu", value: "8" },
+    { day: "Fri", value: "8" },
+    { day: "Sat", value: "6" },
+    { day: "Sun", value: "6" }
   ];
 
   return (
@@ -212,6 +223,44 @@ const EventCouponForm = () => {
                 </div>
               </div>
 
+              {/* Booking End Date & Time when not forever */}
+              {!forever && (
+                <div className="space-y-3 border-t pt-4">
+                  <Label className="text-sm font-medium">Booking End Date & Time</Label>
+                  <div className="grid grid-cols-2 gap-2 max-w-md">
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            "justify-start text-left font-normal",
+                            !bookingEndDate && "text-muted-foreground"
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {bookingEndDate ? format(bookingEndDate, "PPP") : <span>Pick date</span>}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <CalendarComponent
+                          mode="single"
+                          selected={bookingEndDate}
+                          onSelect={setBookingEndDate}
+                          initialFocus
+                          className="p-3 pointer-events-auto"
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <Input
+                      type="time"
+                      value={bookingEndTime}
+                      onChange={(e) => setBookingEndTime(e.target.value)}
+                      className="bg-muted"
+                    />
+                  </div>
+                </div>
+              )}
+
               {/* Date/Time Selection when not forever */}
               {!forever && (
                 <div className="space-y-6 border-t pt-4">
@@ -288,43 +337,43 @@ const EventCouponForm = () => {
                       </div>
                     </div>
                   </div>
+                </div>
+              )}
+            </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Booking End Date & Time */}
-                    <div className="space-y-3">
-                      <Label className="text-sm font-medium">Booking End Date & Time</Label>
-                      <div className="grid grid-cols-2 gap-2">
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant="outline"
-                              className={cn(
-                                "justify-start text-left font-normal",
-                                !bookingEndDate && "text-muted-foreground"
-                              )}
-                            >
-                              <CalendarIcon className="mr-2 h-4 w-4" />
-                              {bookingEndDate ? format(bookingEndDate, "PPP") : <span>Pick date</span>}
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
-                            <CalendarComponent
-                              mode="single"
-                              selected={bookingEndDate}
-                              onSelect={setBookingEndDate}
-                              initialFocus
-                              className="p-3 pointer-events-auto"
-                            />
-                          </PopoverContent>
-                        </Popover>
-                        <Input
-                          type="time"
-                          value={bookingEndTime}
-                          onChange={(e) => setBookingEndTime(e.target.value)}
-                          className="bg-muted"
-                        />
+            {/* Restricted Time Section */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <Label className="text-base font-semibold flex items-center gap-2">
+                  <Clock className="h-4 w-4" />
+                  Restricted Time
+                </Label>
+                <Switch
+                  checked={restrictedTime}
+                  onCheckedChange={(checked) => setRestrictedTime(checked)}
+                />
+              </div>
+              
+              {restrictedTime && (
+                <div className="space-y-4">
+                  <Label className="text-base font-semibold flex items-center gap-2">
+                    <Calendar className="h-4 w-4" />
+                    Weekly Time Duration
+                  </Label>
+                  <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
+                    {weeklyTimeRestrictions.map((item) => (
+                      <div key={item.day} className="text-center space-y-2">
+                        <Label className="text-sm font-medium text-muted-foreground">{item.day}</Label>
+                        <div className="relative">
+                          <Input
+                            value={item.value}
+                            className="h-10 text-center font-semibold bg-accent border-2"
+                            readOnly
+                          />
+                          <span className="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs text-muted-foreground">h</span>
+                        </div>
                       </div>
-                    </div>
+                    ))}
                   </div>
                 </div>
               )}
