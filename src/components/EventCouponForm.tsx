@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { X, MapPin, Calendar, Clock, Percent, Tag, DollarSign, CalendarIcon } from "lucide-react";
@@ -21,6 +22,8 @@ const EventCouponForm = () => {
   const [duration, setDuration] = useState("8");
   const [locations] = useState(["Building-1, Ecospace", "Building-2, Ecospace"]);
   const [discountType, setDiscountType] = useState<"%" | "$">("%");
+  const [unlimitedUsage, setUnlimitedUsage] = useState(true);
+  const [perDay, setPerDay] = useState(false);
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
   const [startTime, setStartTime] = useState("09:00");
@@ -51,15 +54,14 @@ const EventCouponForm = () => {
                   <p className="text-muted-foreground text-sm">Updated by: Sandeep Koduri</p>
                 </div>
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setDiscountType(discountType === "%" ? "$" : "%")}
-                className="px-3 py-1 h-8"
-              >
-                {discountType === "%" ? <Percent className="h-4 w-4" /> : <DollarSign className="h-4 w-4" />}
-                <span className="ml-1 text-sm font-medium">{discountType}</span>
-              </Button>
+              <div className="flex items-center gap-3">
+                <Label className="text-sm font-medium">%</Label>
+                <Switch
+                  checked={discountType === "$"}
+                  onCheckedChange={(checked) => setDiscountType(checked ? "$" : "%")}
+                />
+                <Label className="text-sm font-medium">$</Label>
+              </div>
             </div>
           </CardHeader>
           
@@ -81,16 +83,32 @@ const EventCouponForm = () => {
               
               <div className="space-y-3">
                 <Label htmlFor="maxUsage" className="text-base font-semibold">Max Usage</Label>
-                <div className="relative">
-                  <Input
-                    id="maxUsage"
-                    value={maxUsage}
-                    onChange={(e) => setMaxUsage(e.target.value)}
-                    className="h-12 text-lg bg-muted border-2"
-                  />
-                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex gap-2">
-                    <Badge variant="outline" className="text-xs">Unlimited Usage</Badge>
-                    <Badge variant="outline" className="text-xs">Per Day</Badge>
+                <Input
+                  id="maxUsage"
+                  value={maxUsage}
+                  onChange={(e) => setMaxUsage(e.target.value)}
+                  className="h-12 text-lg bg-muted border-2"
+                />
+                <div className="flex gap-4">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="unlimitedUsage" 
+                      checked={unlimitedUsage}
+                      onCheckedChange={(checked) => setUnlimitedUsage(checked === true)}
+                    />
+                    <Label htmlFor="unlimitedUsage" className="text-sm font-medium">
+                      Unlimited Usage
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="perDay" 
+                      checked={perDay}
+                      onCheckedChange={(checked) => setPerDay(checked === true)}
+                    />
+                    <Label htmlFor="perDay" className="text-sm font-medium">
+                      Per Day
+                    </Label>
                   </div>
                 </div>
               </div>
@@ -100,19 +118,21 @@ const EventCouponForm = () => {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <Label className="text-base font-semibold flex items-center gap-2">
-                  <Percent className="h-4 w-4" />
-                  Discount
+                  {discountType === "%" ? <Percent className="h-4 w-4" /> : <DollarSign className="h-4 w-4" />}
+                  {discountType === "%" ? "Discount" : "Parking Fee $"}
                 </Label>
-                <div className="flex items-center space-x-2">
-                  <Checkbox 
-                    id="variableDiscount" 
-                    checked={variableDiscount}
-                    onCheckedChange={(checked) => setVariableDiscount(checked === true)}
-                  />
-                  <Label htmlFor="variableDiscount" className="text-sm font-medium">
-                    Variable Discount
-                  </Label>
-                </div>
+                {discountType === "%" && (
+                  <div className="flex items-center space-x-2">
+                    <Checkbox 
+                      id="variableDiscount" 
+                      checked={variableDiscount}
+                      onCheckedChange={(checked) => setVariableDiscount(checked === true)}
+                    />
+                    <Label htmlFor="variableDiscount" className="text-sm font-medium">
+                      Variable Discount
+                    </Label>
+                  </div>
+                )}
               </div>
               
               <div className="flex items-center gap-4">
@@ -128,7 +148,7 @@ const EventCouponForm = () => {
             </div>
 
             {/* Weekly Discount Schedule */}
-            {variableDiscount && (
+            {variableDiscount && discountType === "%" && (
               <div className="space-y-4">
                 <Label className="text-base font-semibold flex items-center gap-2">
                   <Calendar className="h-4 w-4" />
